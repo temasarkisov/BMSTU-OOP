@@ -1,5 +1,5 @@
-#ifndef INTERACTION_H
-#define INTERACTION_H
+#ifndef COMPULATION_H
+#define COMPULATION_H
 
 #include <math.h>
 
@@ -9,4 +9,4 @@
 
 void rotateModel(const modelT *const model);
 
-#endif // INTERACTION_H
+#endif // COMPULATION_H

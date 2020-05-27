@@ -8,7 +8,6 @@
 #include <string>
 
 #include "errors.h"
-#include "interaction.h"
 
 using namespace std;
 
@@ -44,6 +43,6 @@ typedef struct {
     int columns;
 } matrixT;
 
-int getFileData(const string fileName);
+int uploadModel(modelT *const model, modelProjT *const modelProj, const string fileName);
 
 #endif // DATAPROCESSING_H

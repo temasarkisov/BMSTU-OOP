@@ -1,4 +1,4 @@
-#include "interaction.h"
+#include "computation.h"
 
 static void matrixDataRotateFormation(matrixT *const matrixDataRotate, const modelT *const model)
 {
@@ -19,7 +19,7 @@ static void matrixDataRotateFormation(matrixT *const matrixDataRotate, const mod
     }
 }
 
-void matrixTransformRotateFormation(matrixT *const matrixTransformRotate, const double angle, const char coordType)
+static void matrixTransformRotateFormation(matrixT *const matrixTransformRotate, const double angle, const char coordType)
 {
     if (coordType == 'x')
     {
@@ -47,7 +47,7 @@ void matrixTransformRotateFormation(matrixT *const matrixTransformRotate, const 
     }
 }
 
-void outputMatrix(const matrixT matrixDataRotate)
+static void outputMatrix(const matrixT matrixDataRotate)
 {
     cout << "\n";
     for (int i = 0; i < matrixDataRotate.rows; i++)

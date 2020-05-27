@@ -16,7 +16,7 @@ MainWindow::~MainWindow()
 
 static void showModelProj(QGraphicsScene *const graphicsScene, const modelProjT *const modelProj)
 {
-    QPen outlinePen(Qt::white);
+    QPen outlinePen(Qt::black);
 
     double dX = SCENE_WIDTH / 2 - modelProj->center.x;
     double dZ = SCENE_HEIGHT / 2 - modelProj->center.z;
