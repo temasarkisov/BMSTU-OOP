@@ -37,12 +37,8 @@ typedef struct {
     bool isLoad = false;
 } modelT;
 
-typedef struct {
-    double **matrix;
-    int rows;
-    int columns;
-} matrixT;
-
 int uploadModel(modelT *const model, modelProjT *const modelProj, const string fileName);
+
+void setModelProjData(modelProjT *const modelProj, const modelT *const model);
 
 #endif // DATAPROCESSING_H

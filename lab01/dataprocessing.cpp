@@ -340,17 +340,9 @@ static int setModelDataWithFile(modelT *const model, const string fileName)
     return SUCCESS;
 }
 
-static int setModelProjData(const modelT *const model, modelProjT *const modelProj)
+void setModelProjData(modelProjT *const modelProj, const modelT *const model)
 {
-    int errorCode = 0;
-
     modelProj->pointsProjNumber = model->pointsNumber;
-
-    errorCode = allocModelProj(modelProj);
-    if (errorCode != SUCCESS)
-    {
-        return errorCode;
-    }
 
     for (int i = 0; i < modelProj->pointsProjNumber; i++)
     {
@@ -368,8 +360,6 @@ static int setModelProjData(const modelT *const model, modelProjT *const modelPr
 
     modelProj->center.x = model->center.x;
     modelProj->center.z = model->center.z;
-
-    return SUCCESS;
 }
 
 int uploadModel(modelT *const model, modelProjT *const modelProj, const string fileName)
@@ -382,9 +372,13 @@ int uploadModel(modelT *const model, modelProjT *const modelProj, const string f
     if (errorCode == SUCCESS)
     {
         copyModel(model, &modelTemp);
-        errorCode = setModelProjData(model, modelProj);
+
+        modelProj->pointsProjNumber = model->pointsNumber;
+        errorCode = allocModelProj(modelProj);
         if (errorCode == SUCCESS)
         {
+            setModelProjData(modelProj, model);
+            model->isLoad = true;
             printModelData(model);
             printModelProjData(modelProj);
         }

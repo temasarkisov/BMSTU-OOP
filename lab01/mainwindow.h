@@ -12,7 +12,7 @@
 #include "ui_mainwindow.h"
 #include "handler.h"
 #include "dataprocessing.h"
-#include "computation.h"
+#include "modeloperations.h"
 
 #define SCENE_WIDTH 500
 #define SCENE_HEIGHT 500
@@ -33,9 +33,9 @@ public:
     ~MainWindow();
 
 private slots:
-    void uploadModelWithFileData();
-
     void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
 
 private:
     Ui::MainWindow *ui;

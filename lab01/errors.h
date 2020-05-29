@@ -9,12 +9,14 @@
 #define ERROR_ALLOC_POINTS_ARRAY 14
 #define ERROR_ALLOC_POINTS_PROJ_ARRAY 15
 #define ERROR_ALLOC_LINKS_MATRIX 16
+#define ERROR_ALLOC_MATRIX 20
+
+#define ERROR_OPER_TYPE 100
+
+#define ERROR_LOAD_MODEL 150
 
 
 #define ERROR_FILE_OPEN 16
 #define ERROR_FILE_DATA 17
-#define ERROR_SEARCH_NONEXISTENT_COORD 18
-
-#define CHECK_CODE_EXIT(cur_code, check_code) ( if (cur_code == check_code) { return 1; } else { return 0; } )
 
 #endif // ERRORS_H

@@ -16,7 +16,7 @@ MainWindow::~MainWindow()
 
 static void showModelProj(QGraphicsScene *const graphicsScene, const modelProjT *const modelProj)
 {
-    QPen outlinePen(Qt::white);
+    QPen outlinePen(Qt::black);
 
     double dX = SCENE_WIDTH / 2 - modelProj->center.x;
     double dZ = SCENE_HEIGHT / 2 - modelProj->center.z;
@@ -37,39 +37,31 @@ static void showModelProj(QGraphicsScene *const graphicsScene, const modelProjT 
     }
 }
 
-void MainWindow::uploadModelWithFileData()
-{
-    int errorCode = 0;
-
-    QString filePath = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath());
-    string fileName = filePath.toStdString();
-    operParamsT operParams = {fileName, UPLOAD, 0};
-
-    errorCode = handler(&model, &modelProj, &operParams);
-    ui->graphicsView->setSceneRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
-    if (errorCode == SUCCESS)
-    {
-        QGraphicsScene *graphicsScene = new QGraphicsScene();
-        showModelProj(graphicsScene, &modelProj);
-        ui->graphicsView->setScene(graphicsScene);
-    }
-}
-
 void MainWindow::on_pushButton_clicked()
 {
     int errorCode = 0;
 
     QString filePath = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath());
     string fileName = filePath.toStdString();
-    operParamsT operParams = {fileName, UPLOAD, 0};
 
-    errorCode = handler(&model, &modelProj, &operParams);
-    ui->graphicsView->setSceneRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
+    errorCode = uploadModel(&model, &modelProj, fileName);
     if (errorCode == SUCCESS)
     {
-        cout << "\n\n" << "SUCCESS";
+        ui->graphicsView->setSceneRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
         QGraphicsScene *graphicsScene = new QGraphicsScene();
         showModelProj(graphicsScene, &modelProj);
         ui->graphicsView->setScene(graphicsScene);
     }
 }
+
+//void MainWindow::on_pushButton_2_clicked()
+//{
+    //int errorCode = 0;
+    //operParamsT operParams;
+
+    //double scaleValue = ui->spinBoxScale->value();
+    //if (scaleValue != 0)
+    //{
+    //    operParams = {SCALE, scaleValue};
+    //}
+//}
