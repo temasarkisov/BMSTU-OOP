@@ -14,54 +14,119 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-static void showModelProj(QGraphicsScene *const graphicsScene, const modelProjT *const modelProj)
+static void printModelProjData(const modelProjT *const modelProj)
 {
-    QPen outlinePen(Qt::black);
+    cout << "\n\n";
+    for (int i = 0; i < modelProj->pointsProjNumber; i++)
+    {
+        cout << modelProj->pointsProjArray[i].x;
+        cout << " ";
+        cout << modelProj->pointsProjArray[i].z;
+        cout << " ";
+    }
 
-    double dX = SCENE_WIDTH / 2 - modelProj->center.x;
-    double dZ = SCENE_HEIGHT / 2 - modelProj->center.z;
-
+    cout << "\n\n";
     for (int i = 0; i < modelProj->pointsProjNumber; i++)
     {
         for (int j = 0; j < modelProj->pointsProjNumber; j++)
         {
-            if (modelProj->linksMatrix[i][j])
-            {
-                double xB = modelProj->pointsProjArray[i].x + dX;
-                double xE = modelProj->pointsProjArray[j].x + dX;
-                double zB = modelProj->pointsProjArray[i].z + dZ;
-                double zE = modelProj->pointsProjArray[j].z + dZ;
-                graphicsScene->addLine(xB, zB, xE, zE, outlinePen);;
-            }
+            cout << modelProj->linksMatrix[i][j];
+            cout << " ";
         }
+
+        cout << "\n";
     }
+
+    cout << "\nCenter:\n";
+    cout << modelProj->center.x << " " << modelProj->center.z << " ";
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_buttonSelectFile_clicked()
 {
     int errorCode = 0;
+    operParamsT operParams;
 
     QString filePath = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath());
-    string fileName = filePath.toStdString();
+    fileName = (char *)calloc(filePath.length(), sizeof (char));
+    strcpy(fileName, filePath.toStdString().c_str());
 
-    errorCode = uploadModel(&model, &modelProj, fileName);
-    if (errorCode == SUCCESS)
-    {
-        ui->graphicsView->setSceneRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
-        QGraphicsScene *graphicsScene = new QGraphicsScene();
-        showModelProj(graphicsScene, &modelProj);
-        ui->graphicsView->setScene(graphicsScene);
-    }
+    operParams = {fileName, UPLOAD, 0, NULL};
+    errorCode = handler(&model, &modelProj, &operParams);
 }
 
-//void MainWindow::on_pushButton_2_clicked()
-//{
-    //int errorCode = 0;
-    //operParamsT operParams;
+void MainWindow::on_buttonProgress_clicked()
+{
+    int errorCode = 0;
+    double value = 0;
+    operParamsT operParams;
 
-    //double scaleValue = ui->spinBoxScale->value();
-    //if (scaleValue != 0)
-    //{
-    //    operParams = {SCALE, scaleValue};
-    //}
-//}
+    printModelProjData(&modelProj);
+
+    value = ui->spinBoxScale->value();
+    if (value != 0)
+    {
+        operParams = {NULL, SCALE, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+    value = ui->spinBoxMoveX->value();
+    if (value != 0)
+    {
+        operParams = {NULL, MOVE_X, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+    value = ui->spinBoxMoveY->value();
+    if (value != 0)
+    {
+        operParams = {NULL, MOVE_Y, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+    value = ui->spinBoxMoveZ->value();
+    if (value != 0)
+    {
+        operParams = {NULL, MOVE_Z, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+    value = ui->spinBoxRotateX->value();
+    if (value != 0)
+    {
+        operParams = {NULL, ROTATE_X, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+    value = ui->spinBoxRotateY->value();
+    if (value != 0)
+    {
+        operParams = {NULL, ROTATE_Y, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+    value = ui->spinBoxRotateZ->value();
+    if (value != 0)
+    {
+        operParams = {NULL, ROTATE_Z, value, NULL};
+        errorCode = handler(&model, &modelProj, &operParams);
+    }
+
+    printModelProjData(&modelProj);
+}
+
+void MainWindow::on_buttonRefresh_clicked()
+{
+    int errorCode = 0;
+    operParamsT operParams;
+
+    operParams = {fileName, UPLOAD, 0, NULL};
+    errorCode = handler(&model, &modelProj, &operParams);
+}
+
+void MainWindow::on_buttonShow_clicked()
+{
+    int errorCode = 0;
+    operParamsT operParams;
+
+    QGraphicsScene *graphicsScene = new QGraphicsScene();
+
+    operParams = {NULL, SHOW, 0, graphicsScene};
+    errorCode = handler(&model, &modelProj, &operParams);
+
+    ui->graphicsView->setSceneRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT);
+    ui->graphicsView->setScene(graphicsScene);
+}

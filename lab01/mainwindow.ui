@@ -40,7 +40,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ROTATE&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="buttonSelectFile">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -97,7 +97,7 @@
      </brush>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox">
+   <widget class="QDoubleSpinBox" name="spinBoxMoveX">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -107,7 +107,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+   <widget class="QDoubleSpinBox" name="spinBoxMoveY">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -117,7 +117,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+   <widget class="QDoubleSpinBox" name="spinBoxMoveZ">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -179,7 +179,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Y&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+   <widget class="QDoubleSpinBox" name="spinBoxRotateZ">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -215,7 +215,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;X&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+   <widget class="QDoubleSpinBox" name="spinBoxRotateX">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -225,7 +225,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+   <widget class="QDoubleSpinBox" name="spinBoxRotateY">
     <property name="geometry">
      <rect>
       <x>100</x>
@@ -235,11 +235,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="buttonProgress">
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>450</y>
+      <y>430</y>
       <width>151</width>
       <height>30</height>
      </rect>
@@ -258,17 +258,30 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="buttonRefresh">
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>480</y>
+      <y>500</y>
       <width>151</width>
       <height>30</height>
      </rect>
     </property>
     <property name="text">
      <string>REFRESH</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonShow">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>460</y>
+      <width>151</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>SHOW</string>
     </property>
    </widget>
   </widget>

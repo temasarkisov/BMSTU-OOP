@@ -2,6 +2,7 @@
 #define ERRORS_H
 
 #define SUCCESS 1
+#define SUCCESS_SCAN 1
 
 #define ERROR_ALLOC_POINT 5
 #define ERROR_ALLOC_MODEL 7

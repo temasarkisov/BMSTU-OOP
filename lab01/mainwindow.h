@@ -13,9 +13,7 @@
 #include "handler.h"
 #include "dataprocessing.h"
 #include "modeloperations.h"
-
-#define SCENE_WIDTH 500
-#define SCENE_HEIGHT 500
+#include "modelshow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,14 +26,19 @@ class MainWindow : public QMainWindow
 public:
     modelT model;
     modelProjT modelProj;
+    char *fileName;
 
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_buttonSelectFile_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_buttonProgress_clicked();
+
+    void on_buttonRefresh_clicked();
+
+    void on_buttonShow_clicked();
 
 private:
     Ui::MainWindow *ui;

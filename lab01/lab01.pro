@@ -20,14 +20,17 @@ SOURCES += \
     handler.cpp \
     main.cpp \
     mainwindow.cpp \
-    modeloperations.cpp
+    modeloperations.cpp \
+    modelshow.cpp
 
 HEADERS += \
     dataprocessing.h \
     errors.h \
     handler.h \
     mainwindow.h \
-    modeloperations.h
+    modeloperations.h \
+    modelshow.h \
+    structs.h
 
 FORMS += \
     mainwindow.ui

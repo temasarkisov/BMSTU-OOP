@@ -1,5 +1,24 @@
 #include "dataprocessing.h"
 
+static void freeLinksMatrix(int **matrix, const int rows){
+    for (int row = 0; row < rows; row++)
+    {
+        free(matrix[row]);
+    }
+
+    free(matrix);
+}
+
+static void freePointsArray(pointT *pointsArray)
+{
+    free(pointsArray);
+}
+
+static void freePointsProjArray(pointProjT *pointsProjArray)
+{
+    free(pointsProjArray);
+}
+
 static int coordMaxIndexDef(const modelT *const model, const char coordType)
 {
     int coordMaxIndex = 0;
@@ -121,7 +140,7 @@ static int allocLinksMatrix(modelT *const model)
     model->linksMatrix = (int **)calloc(model->pointsNumber, sizeof (int *));
     if (!model->linksMatrix)
     {
-        //freePointsArray(model);
+        freePointsArray(model->pointsArray);
         return ERROR_ALLOC_LINKS_MATRIX;
     }
 
@@ -130,13 +149,8 @@ static int allocLinksMatrix(modelT *const model)
         model->linksMatrix[row] = (int *)calloc(model->pointsNumber, sizeof (int));
         if (!model->linksMatrix[row])
         {
-            //freePointsArray(model);
-
-            for (int i = 0; i < row; i++)
-            {
-                free(model->linksMatrix[i]);
-            }
-            free(model->linksMatrix);
+            freePointsArray(model->pointsArray);
+            freeLinksMatrix(model->linksMatrix, model->pointsNumber);
 
             return ERROR_ALLOC_LINKS_MATRIX;
         }
@@ -150,7 +164,7 @@ static int allocLinksMatrix(modelProjT *const modelProj)
     modelProj->linksMatrix = (int **)calloc(modelProj->pointsProjNumber, sizeof (int *));
     if (!modelProj->linksMatrix)
     {
-        //freePointsArray(model);
+        freePointsProjArray(modelProj->pointsProjArray);
         return ERROR_ALLOC_LINKS_MATRIX;
     }
 
@@ -159,13 +173,8 @@ static int allocLinksMatrix(modelProjT *const modelProj)
         modelProj->linksMatrix[row] = (int *)calloc(modelProj->pointsProjNumber, sizeof (int));
         if (!modelProj->linksMatrix[row])
         {
-            //freePointsProjArray(model);
-
-            //for (int i = 0; i < row; i++)
-            //{
-            //    free(modelProj->linksMatrix[i]);
-            //}
-            //free(modelProj->linksMatrix);
+            freePointsProjArray(modelProj->pointsProjArray);
+            freeLinksMatrix(modelProj->linksMatrix, modelProj->pointsProjNumber);
 
             return ERROR_ALLOC_LINKS_MATRIX;
         }
@@ -181,15 +190,14 @@ static int allocModel(modelT *const model)
     errorCode = allocPointsArray(model);
     if (errorCode != SUCCESS)
     {
-        //freePointsArray(model);
         return errorCode;
     }
 
     errorCode = allocLinksMatrix(model);
     if (errorCode != SUCCESS)
     {
-        //freePointsArray(model);
-        //freeLinksMatrix(model);
+        freePointsArray(model->pointsArray);
+        freeLinksMatrix(model->linksMatrix, model->pointsNumber);
         delete model;
     }
 
@@ -203,15 +211,14 @@ static int allocModelProj(modelProjT *const modelProj)
     errorCode = allocPointsProjArray(modelProj);
     if (errorCode != SUCCESS)
     {
-        //freePointsProjArray(model);
         return errorCode;
     }
 
     errorCode = allocLinksMatrix(modelProj);
     if (errorCode != SUCCESS)
     {
-        //freePointsProjArray(model);
-        //freeLinksMatrix(model);
+        freePointsProjArray(modelProj->pointsProjArray);
+        freeLinksMatrix(modelProj->linksMatrix, modelProj->pointsProjNumber);
     }
 
     return SUCCESS;
@@ -273,7 +280,7 @@ static void printModelProjData(const modelProjT *const modelProj)
     cout << modelProj->center.x << " " << modelProj->center.z << " ";
 }
 
-static void copyModel(modelT *const model, modelT *const modelTemp)
+static void copyModel(modelT *const model, const modelT *const modelTemp)
 {
     model->pointsArray = modelTemp->pointsArray;
     model->pointsNumber = modelTemp->pointsNumber;
@@ -282,65 +289,102 @@ static void copyModel(modelT *const model, modelT *const modelTemp)
     model->isLoad = modelTemp->isLoad;
 }
 
-static int setModelDataWithFile(modelT *const model, const string fileName)
+static int pointsLinksNumbersScan(int *const pointsNumber, int *const linksNumber, FILE *const filePtr)
 {
-    int errorCode = 0, linksNumber = 0;
+    int errorCode = 0;
 
-    ifstream file(fileName);
-    if (!file.is_open())
+    errorCode = fscanf(filePtr, "%d", pointsNumber);
+    if (errorCode == SUCCESS)
     {
-        return ERROR_FILE_OPEN;
+        fscanf(filePtr, "%d", linksNumber);
+        if (errorCode == SUCCESS_SCAN)
+        {
+            if (*(pointsNumber) >= 1 && *(linksNumber) >= 1)
+            {
+                return SUCCESS;
+            }
+        }
     }
 
-    file >> model->pointsNumber >> linksNumber;
-    if (file.fail() || model->pointsNumber < 1 || linksNumber < 1)
-    {
-        return ERROR_FILE_DATA;
-    }
+    return ERROR_FILE_DATA;
+}
 
-    errorCode = allocModel(model);
-    if (errorCode != SUCCESS)
-    {
-        return errorCode;
-    }
+static int pointArrayScan(pointT *const pointsArray, const int pointsNumber, FILE *const filePtr)
+{
+    int errorCode = 0;
 
-    for (int i = 0; i < model->pointsNumber; i++)
+    for (int i = 0; i < pointsNumber; i++)
     {
-        file >> model->pointsArray[i].x;
-        file >> model->pointsArray[i].y;
-        file >> model->pointsArray[i].z;
-    }
-
-    if (file.fail())
-    {
-        return ERROR_FILE_DATA;
-    }
-
-    for (int i = 0; i < linksNumber; i++)
-    {
-        int firstPointIndex = 0, secondPointIndex = 0;
-        file >> firstPointIndex >> secondPointIndex;
-        if (firstPointIndex < 1 || firstPointIndex > model->pointsNumber ||
-            secondPointIndex < 1 || secondPointIndex > model->pointsNumber)
+        errorCode = fscanf(filePtr, "%lf %lf %lf", &(pointsArray[i].x), &(pointsArray[i].y), &(pointsArray[i].z));
+        if (errorCode != 3)
         {
             return ERROR_FILE_DATA;
         }
-        model->linksMatrix[firstPointIndex - 1][secondPointIndex - 1] = 1;
-        model->linksMatrix[secondPointIndex - 1][firstPointIndex - 1] = 1;
     }
 
-    if (file.fail())
-    {
-        return ERROR_FILE_DATA;
-    }
-
-    setCenter(model);
-
-    file.close();
     return SUCCESS;
 }
 
-void setModelProjData(modelProjT *const modelProj, const modelT *const model)
+static int linksMatrixScan(int *const*const linksMatrix, const int linksNumber, const int pointsNumber, FILE *const filePtr)
+{
+    int errorCode = 0;
+    int firstPointIndex = 0, secondPointIndex = 0;
+
+    for (int i = 0; i < linksNumber; i++)
+    {
+        errorCode = fscanf(filePtr, "%d %d", &firstPointIndex, &secondPointIndex);
+        if (errorCode == 2)
+        {
+            if (firstPointIndex >= 1 && firstPointIndex <= pointsNumber && secondPointIndex >= 1 && secondPointIndex <= pointsNumber)
+            {
+                linksMatrix[firstPointIndex - 1][secondPointIndex - 1] = 1;
+                linksMatrix[secondPointIndex - 1][firstPointIndex - 1] = 1;
+            }
+        }
+
+        else
+        {
+            return ERROR_FILE_DATA;
+        }
+    }
+
+    return SUCCESS;
+}
+
+static int setModelDataWithFile(modelT *const model, const char *const fileName)
+{
+    int errorCode = 0, linksNumber = 0;
+    FILE *filePtr;
+
+    filePtr = fopen(fileName, "r");
+
+    if (filePtr != NULL)
+    {
+        errorCode = pointsLinksNumbersScan(&(model->pointsNumber), &(linksNumber), filePtr);
+        if (errorCode == SUCCESS)
+        {
+            errorCode = allocModel(model);
+            if (errorCode == SUCCESS)
+            {
+                errorCode = pointArrayScan(model->pointsArray, model->pointsNumber, filePtr);
+                if (errorCode == SUCCESS)
+                {
+                    errorCode = linksMatrixScan(model->linksMatrix, linksNumber, model->pointsNumber, filePtr);
+                    if (errorCode == SUCCESS)
+                    {
+                        setCenter(model);
+                        fclose(filePtr);
+                        return SUCCESS;
+                    }
+                }
+            }
+        }
+    }
+
+    return ERROR_FILE_OPEN;
+}
+
+static void setModelProjData(modelProjT *const modelProj, const modelT *const model)
 {
     modelProj->pointsProjNumber = model->pointsNumber;
 
@@ -362,7 +406,7 @@ void setModelProjData(modelProjT *const modelProj, const modelT *const model)
     modelProj->center.z = model->center.z;
 }
 
-int uploadModel(modelT *const model, modelProjT *const modelProj, const string fileName)
+int uploadModel(modelT *const model, modelProjT *const modelProj, const char *const fileName)
 {
     int errorCode = 0;
 
@@ -379,6 +423,7 @@ int uploadModel(modelT *const model, modelProjT *const modelProj, const string f
         {
             setModelProjData(modelProj, model);
             model->isLoad = true;
+
             printModelData(model);
             printModelProjData(modelProj);
         }

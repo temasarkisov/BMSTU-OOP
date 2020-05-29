@@ -1,5 +1,14 @@
 #include "modeloperations.h"
 
+static void freeMatrix(matrixT *const matrix){
+    for (int row = 0; row < matrix->rows; row++)
+    {
+        free(matrix->matrix[row]);
+    }
+
+    free(matrix->matrix);
+}
+
 static int allocMatrix(matrixT *const matrix, const int rows, const int columns)
 {
     matrix->rows = rows;
@@ -8,7 +17,6 @@ static int allocMatrix(matrixT *const matrix, const int rows, const int columns)
     matrix->matrix = (double **)calloc(matrix->rows, sizeof (double *));
     if (!matrix->matrix)
     {
-        //freeMatrix(matrix);
         return ERROR_ALLOC_MATRIX;
     }
 
@@ -17,7 +25,7 @@ static int allocMatrix(matrixT *const matrix, const int rows, const int columns)
         matrix->matrix[row] = (double *)calloc(matrix->columns, sizeof (double));
         if (!matrix->matrix[row])
         {
-            //freeMatrix(matrix);
+            freeMatrix(matrix);
             return ERROR_ALLOC_MATRIX;
         }
 
@@ -131,7 +139,7 @@ static int multiplicationMatrix(matrixT *const matrixOriginal, matrixT *const ma
         }
     }
 
-    //freeMatrix(&matrixResult);
+    freeMatrix(&matrixResult);
 
     return SUCCESS;
 }
@@ -159,6 +167,28 @@ static void offsetModelCenter(modelT *const model, const bool isCenter)
         model->pointsArray[i].y += offsetY;
         model->pointsArray[i].z += offsetZ;
     }
+}
+
+static void setModelProjData(modelProjT *const modelProj, const modelT *const model)
+{
+    modelProj->pointsProjNumber = model->pointsNumber;
+
+    for (int i = 0; i < modelProj->pointsProjNumber; i++)
+    {
+        modelProj->pointsProjArray[i].x = model->pointsArray[i].x;
+        modelProj->pointsProjArray[i].z = model->pointsArray[i].z;
+    }
+
+    for (int i = 0; i < modelProj->pointsProjNumber; i++)
+    {
+        for (int j = 0; j < modelProj->pointsProjNumber; j++)
+        {
+            modelProj->linksMatrix[i][j] = model->linksMatrix[i][j];
+        }
+    }
+
+    modelProj->center.x = model->center.x;
+    modelProj->center.z = model->center.z;
 }
 
 int operatingModel(modelT *const model, modelProjT *const modelProj, const operParamsT *const operParams)
@@ -189,15 +219,11 @@ int operatingModel(modelT *const model, modelProjT *const modelProj, const operP
         errorCode = allocMatrix(&matrixOperating, elementsNumber, elementsNumber);
         if (errorCode != SUCCESS)
         {
-            //freeMatrix(matrixOriginal);
+            freeMatrix(&matrixOriginal);
             return ERROR_ALLOC_MATRIX;
         }
 
-        if (operParams->operType == UPLOAD)
-        {
-            return ERROR_OPER_TYPE;
-        }
-        else if (operParams->operType == ROTATE_X)
+        if (operParams->operType == ROTATE_X)
         {
             matrixOperatingRotateFormation(&matrixOperating, operParams->value, X);
         }
@@ -231,8 +257,8 @@ int operatingModel(modelT *const model, modelProjT *const modelProj, const operP
         errorCode = multiplicationMatrix(&matrixOriginal, &matrixOperating);
         if (errorCode != SUCCESS)
         {
-            //freeMatrix(&matrixOriginal);
-            //freeMatrix(&matrixOperating);
+            freeMatrix(&matrixOriginal);
+            freeMatrix(&matrixOperating);
         }
 
         for (int i = 0; i < model->pointsNumber; i++)
@@ -242,8 +268,8 @@ int operatingModel(modelT *const model, modelProjT *const modelProj, const operP
                 model->pointsArray[i].z = matrixOriginal.matrix[i][2];
         }
 
-        //freeMatrix(&matrixOriginal);
-        //freeMatrix(&matrixOperating);
+        freeMatrix(&matrixOriginal);
+        freeMatrix(&matrixOperating);
 
         offsetModelCenter(model, true);
         setModelProjData(modelProj, model);
@@ -253,30 +279,6 @@ int operatingModel(modelT *const model, modelProjT *const modelProj, const operP
 
     return ERROR_LOAD_MODEL;
 }
-
-//int scaleModel(modelT *const model, modelProjT *const modelProj, const operParamsT *const operParams)
-//{
-//    int errorCode = 0;
-//
-//    if (model->isLoad == true)
-//    {
-//        offsetModelCenter(model, false);
-
-//        errorCode = operatingModel(model, operParams->value, operParams->operType);
-//        if (errorCode != SUCCESS)
-//        {
-//            return errorCode;
-//        }
-
-//        offsetModelCenter(model, true);
-//        setModelProjData(modelProj, model);
-
-//        return SUCCESS;
-//    }
-
-//    return ERROR_LOAD_MODEL;
-//}
-
 
 
 
