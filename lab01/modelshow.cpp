@@ -1,7 +1,15 @@
 #include "modelshow.h"
 
-void showModelProj(QGraphicsScene *const graphicsScene, const modelProjT *const modelProj)
+int showModelProj(QGraphicsScene *const graphicsScene, modelProjT *const modelProj, const modelT *const model)
 {
+    int errorCode = 0;
+
+    errorCode = modelProjFormation(modelProj, model);
+    if (errorCode != SUCCESS)
+    {
+        return errorCode;
+    }
+
     QPen outlinePen(Qt::black);
 
     double dX = SCENE_WIDTH / 2 - modelProj->center.x;
@@ -21,4 +29,6 @@ void showModelProj(QGraphicsScene *const graphicsScene, const modelProjT *const 
             }
         }
     }
+
+    return SUCCESS;
 }

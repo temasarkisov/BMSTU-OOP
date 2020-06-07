@@ -17,7 +17,8 @@
 #define ERROR_LOAD_MODEL 150
 
 
-#define ERROR_FILE_OPEN 16
-#define ERROR_FILE_DATA 17
+#define ERROR_FILE_OPEN 20
+#define ERROR_FILE_DATA 21
+#define ERROR_FILE_DATA_SCAN 22
 
 #endif // ERRORS_H

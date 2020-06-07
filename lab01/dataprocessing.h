@@ -12,6 +12,8 @@
 
 using namespace std;
 
-int uploadModel(modelT *const model, modelProjT *const modelProj, const char *const fileName);
+int uploadModel(modelT *const model, const char *const fileName);
+
+int modelProjFormation(modelProjT *const modelProj, const modelT *const model);
 
 #endif // DATAPROCESSING_H

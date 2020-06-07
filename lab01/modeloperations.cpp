@@ -169,29 +169,7 @@ static void offsetModelCenter(modelT *const model, const bool isCenter)
     }
 }
 
-static void setModelProjData(modelProjT *const modelProj, const modelT *const model)
-{
-    modelProj->pointsProjNumber = model->pointsNumber;
-
-    for (int i = 0; i < modelProj->pointsProjNumber; i++)
-    {
-        modelProj->pointsProjArray[i].x = model->pointsArray[i].x;
-        modelProj->pointsProjArray[i].z = model->pointsArray[i].z;
-    }
-
-    for (int i = 0; i < modelProj->pointsProjNumber; i++)
-    {
-        for (int j = 0; j < modelProj->pointsProjNumber; j++)
-        {
-            modelProj->linksMatrix[i][j] = model->linksMatrix[i][j];
-        }
-    }
-
-    modelProj->center.x = model->center.x;
-    modelProj->center.z = model->center.z;
-}
-
-int operatingModel(modelT *const model, modelProjT *const modelProj, const operParamsT *const operParams)
+int operatingModel(modelT *const model, const operParamsT *const operParams)
 {
     int errorCode = 0;
     int elementsNumber = 0;
@@ -272,7 +250,7 @@ int operatingModel(modelT *const model, modelProjT *const modelProj, const operP
         freeMatrix(&matrixOperating);
 
         offsetModelCenter(model, true);
-        setModelProjData(modelProj, model);
+        //setModelProjData(modelProj, model);
 
         return SUCCESS;
     }

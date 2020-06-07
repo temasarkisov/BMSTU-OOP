@@ -10,6 +10,6 @@
 
 using namespace std;
 
-int operatingModel(modelT *const model, modelProjT *const modelProj, const operParamsT *const operParams);
+int operatingModel(modelT *const model, const operParamsT *const operParams);
 
 #endif // MODELOPERATIONS_H

@@ -294,14 +294,14 @@ static int pointsLinksNumbersScan(int *const pointsNumber, int *const linksNumbe
     int errorCode = 0;
 
     errorCode = fscanf(filePtr, "%d", pointsNumber);
-    if (errorCode == SUCCESS)
+    if (errorCode == SUCCESS_SCAN)
     {
         fscanf(filePtr, "%d", linksNumber);
         if (errorCode == SUCCESS_SCAN)
         {
             if (*(pointsNumber) >= 1 && *(linksNumber) >= 1)
             {
-                return SUCCESS;
+                return SUCCESS_SCAN;
             }
         }
     }
@@ -322,7 +322,7 @@ static int pointArrayScan(pointT *const pointsArray, const int pointsNumber, FIL
         }
     }
 
-    return SUCCESS;
+    return SUCCESS_SCAN;
 }
 
 static int linksMatrixScan(int *const*const linksMatrix, const int linksNumber, const int pointsNumber, FILE *const filePtr)
@@ -348,7 +348,7 @@ static int linksMatrixScan(int *const*const linksMatrix, const int linksNumber, 
         }
     }
 
-    return SUCCESS;
+    return SUCCESS_SCAN;
 }
 
 static int setModelDataWithFile(modelT *const model, const char *const fileName)
@@ -358,30 +358,38 @@ static int setModelDataWithFile(modelT *const model, const char *const fileName)
 
     filePtr = fopen(fileName, "r");
 
-    if (filePtr != NULL)
+    if (filePtr == NULL)
     {
-        errorCode = pointsLinksNumbersScan(&(model->pointsNumber), &(linksNumber), filePtr);
-        if (errorCode == SUCCESS)
-        {
-            errorCode = allocModel(model);
-            if (errorCode == SUCCESS)
-            {
-                errorCode = pointArrayScan(model->pointsArray, model->pointsNumber, filePtr);
-                if (errorCode == SUCCESS)
-                {
-                    errorCode = linksMatrixScan(model->linksMatrix, linksNumber, model->pointsNumber, filePtr);
-                    if (errorCode == SUCCESS)
-                    {
-                        setCenter(model);
-                        fclose(filePtr);
-                        return SUCCESS;
-                    }
-                }
-            }
-        }
+        return ERROR_FILE_OPEN;
     }
 
-    return ERROR_FILE_OPEN;
+    errorCode = pointsLinksNumbersScan(&(model->pointsNumber), &(linksNumber), filePtr);
+    if (errorCode != SUCCESS_SCAN)
+    {
+        return errorCode;
+    }
+
+    errorCode = allocModel(model);
+    if (errorCode != SUCCESS)
+    {
+        return errorCode;
+    }
+
+    errorCode = pointArrayScan(model->pointsArray, model->pointsNumber, filePtr);
+    if (errorCode != SUCCESS_SCAN)
+    {
+        return errorCode;
+    }
+
+    errorCode = linksMatrixScan(model->linksMatrix, linksNumber, model->pointsNumber, filePtr);
+    if (errorCode != SUCCESS_SCAN)
+    {
+        return errorCode;
+    }
+
+    setCenter(model);
+    fclose(filePtr);
+    return SUCCESS;
 }
 
 static void setModelProjData(modelProjT *const modelProj, const modelT *const model)
@@ -406,27 +414,36 @@ static void setModelProjData(modelProjT *const modelProj, const modelT *const mo
     modelProj->center.z = model->center.z;
 }
 
-int uploadModel(modelT *const model, modelProjT *const modelProj, const char *const fileName)
+int modelProjFormation(modelProjT *const modelProj, const modelT *const model)
+{
+    int errorCode = 0;
+
+    modelProj->pointsProjNumber = model->pointsNumber;
+    errorCode = allocModelProj(modelProj);
+    if (errorCode == SUCCESS)
+    {
+        setModelProjData(modelProj, model);
+
+        printModelData(model);
+        printModelProjData(modelProj);
+    }
+
+    return errorCode;
+}
+
+int uploadModel(modelT *const model, const char *const fileName)
 {
     int errorCode = 0;
 
     modelT modelTemp;
+    cout << "\n" << "TRAVIS" << "\n";
 
     errorCode = setModelDataWithFile(&modelTemp, fileName);
     if (errorCode == SUCCESS)
     {
+        model->isLoad = true;
         copyModel(model, &modelTemp);
-
-        modelProj->pointsProjNumber = model->pointsNumber;
-        errorCode = allocModelProj(modelProj);
-        if (errorCode == SUCCESS)
-        {
-            setModelProjData(modelProj, model);
-            model->isLoad = true;
-
-            printModelData(model);
-            printModelProjData(modelProj);
-        }
+        printModelData(model);
     }
 
     return errorCode;
